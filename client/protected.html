@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Protected Page</title>
+    <!-- تضمين ملفات Bootstrap -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <!-- تضمين مكتبة Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1>Dashboard</h1>
+         
+        <form id="dataForm">
+            <div class="mb-3">
+                <label for="name" class="form-label">الاسم:</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="price" class="form-label">السعر:</label>
+                <input type="number" id="price" name="price" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> إضافة المنتج</button>
+        </form>
+
+        <table id="productsTable" class="table mt-4">
+            <thead>
+                <tr>
+                    <th>الاسم</th>
+                    <th>السعر</th>
+                    <th>الإجراء</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- سيتم إضافة المنتجات هنا -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+
+        function renderProducts(products) {
+            const tableBody = document.querySelector('#productsTable tbody');
+            tableBody.innerHTML = '';
+
+            products.forEach(product => {
+                const row = document.createElement('tr');
+
+                const nameCell = document.createElement('td');
+                nameCell.textContent = product.name;
+                row.appendChild(nameCell);
+
+                const priceCell = document.createElement('td');
+                priceCell.textContent = product.price;
+                row.appendChild(priceCell);
+
+                const actionCell = document.createElement('td');
+
+                const deleteButton = document.createElement('button');
+                deleteButton.innerHTML = '<i class="fas fa-trash"></i> حذف';
+                deleteButton.classList.add('btn', 'btn-danger', 'me-2');
+                deleteButton.addEventListener('click', () => deleteProduct(product._id));
+                actionCell.appendChild(deleteButton);
+
+                const updateButton = document.createElement('button');
+                updateButton.innerHTML = '<i class="fas fa-pencil-alt"></i> تحديث';
+                updateButton.classList.add('btn', 'btn-primary');
+                updateButton.addEventListener('click', () => updateProduct(product._id, product.name, product.price));
+                actionCell.appendChild(updateButton);
+
+                row.appendChild(actionCell);
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        function fetchProducts() {
+            fetch('http://localhost:3000/api/products', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    renderProducts(data);
+                })
+                .catch(error => console.error('خطأ:', error));
+        }
+
+        function deleteProduct(productId) {
+            fetch(`http://localhost:3000/api/products/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    fetchProducts();
+                })
+                .catch(error => console.error('خطأ:', error));
+        }
+
+        function updateProduct(productId, currentName, currentPrice) {
+            const newName = prompt('أدخل الاسم الجديد:', currentName);
+            const newPrice = prompt('أدخل السعر الجديد:', currentPrice);
+
+            const formData = { name: newName, price: newPrice };
+
+            fetch(`http://localhost:3000/api/products/${productId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'ContentType': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    fetchProducts();
+                })
+                .catch(error => console.error('خطأ:', error));
+        }
+
+        function addProduct(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const price = document.getElementById('price').value;
+
+            const formData = { name, price };
+
+            fetch('http://localhost:3000/api/products', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    fetchProducts();
+                    document.getElementById('name').value = '';
+                    document.getElementById('price').value = '';
+                })
+                .catch(error => console.error('خطأ:', error));
+        }
+
+        document.getElementById('dataForm').addEventListener('submit', addProduct);
+
+        fetchProducts();
+    </script>
+</body>
+
+</html>
