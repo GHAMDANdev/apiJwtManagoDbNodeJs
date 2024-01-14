@@ -12,7 +12,7 @@ This project is an API application for managing a Manago database using JWT.
    git clone https://github.com/GHAMDANdev/apiJwtManagoDbNodeJs.git
  
 
-## 🚀 Getting Started
+## 🚀 Getting Started  the project 
 
    
    cd apiJwtManagoDbNodeJs
