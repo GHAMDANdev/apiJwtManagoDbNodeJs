@@ -13,11 +13,22 @@
 
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required><br><br>
-
+        <button type="submit" id="registerButton">Register</button>
         <button type="submit">Login</button>
     </form>
 
     <script>
+
+document.getElementById('registerButton').addEventListener('click', function (event) {
+        event.preventDefault();
+
+        // إعادة توجيه المستخدم إلى صفحة أخرى (Register.html)
+        window.location.href = 'Register.html';
+    });
+
+
+
+
         document.getElementById('loginForm').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -39,6 +50,7 @@
 
                     // إعادة توجيه المستخدم إلى صفحة محمية
                     window.location.href = 'protected.html';
+                   // window.location.href = 'Register.html';
                 })
                 .catch(error => console.error('Error:', error));
         });

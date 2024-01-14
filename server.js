@@ -33,8 +33,16 @@ const ProductSchema = new mongoose.Schema({
     price: Number
 });
 
+// Create Account schema and model
+const accountSchema = new mongoose.Schema({
+    username: String,
+    password: String
+    
+});
+
 const User = mongoose.model('User', UserSchema);
 const Product = mongoose.model('Product', ProductSchema);
+const Account = mongoose.model('Account', accountSchema);
 
 // Middleware للتحقق من صحة JWT
 function authenticateToken(req, res, next) {
@@ -77,6 +85,28 @@ app.post('/api/login', cors(), async (req, res) => {
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+// API to add accounts
+app.post('/api/accounts', authenticateToken, (req, res) => {
+    const {username ,  password} = req.body;
+
+    // Create a new account
+    const account = new Account({ username , password });
+    
+    
+    // Save the Account to the database
+    account.save()
+        .then(() => {
+            return res.json({ message: 'Account added successfully' });
+        })
+        .catch(error => {
+            console.error(error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
+
+
+
+
 
 // API محمية يمكن الوصول إليها بواسطة JWT
 app.get('/api/protected', authenticateToken, (req, res) => {
@@ -100,6 +130,7 @@ app.post('/api/products', authenticateToken, (req, res) => {
             return res.status(500).json({ error: 'Internal Server Error' });
         });
 });
+
 
 // API to get all products
 app.get('/api/products', authenticateToken, (req, res) => {
@@ -129,6 +160,8 @@ app.get('/api/products/:id', authenticateToken, (req, res) => {
             return res.status(500).json({ error: 'Internal Server Error' });
         });
 });
+
+
 
 // API to update a product by ID
 app.put('/api/products/:id', authenticateToken, (req, res) => {
