@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Product</title>
+</head>
+<body>
+    <h1>Update Product</h1>
+    <form id="updateProductForm">
+        <label for="newName">New Name:</label>
+        <input type="text" id="newName" name="newName" required><br><br>
+        <label for="newPrice">New Price:</label>
+        <input type="number" id="newPrice" name="newPrice" required><br><br>
+        <button type="submit">Update Product</button>
+    </form>
+
+    <script>
+        // استخراج البيانات من عنوان URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const productId = urlParams.get('productId');
+        const productName = urlParams.get('productName');
+        const productPrice = urlParams.get('productPrice');
+
+        // ملء حقول النموذج بالبيانات المستخرجة
+        document.getElementById('newName').value = productName;
+        document.getElementById('newPrice').value = productPrice;
+
+        document.getElementById('updateProductForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // منع الإرسال الافتراضي للنموذج
+            const newName = document.getElementById('newName').value;
+            const newPrice = document.getElementById('newPrice').value;
+
+            const formData = { name: newName, price: newPrice };
+
+            // إرسال طلب تحديث المنتج باستخدام البيانات المدخلة
+            fetch(`http://localhost:3000/api/products/${productId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                alert('Product updated successfully!');
+                // إعادة توجيه المستخدم بعد التحديث إلى صفحة أخرى أو إلى الصفحة الرئيسية
+                window.location.href = 'protected.html';
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Create User</title>
+</head>
+
+<body>
+    <h1>Create User</h1>
+    <form id="createUserForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        <input type="submit" value="Create User">
+    </form>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        const createUserForm = document.getElementById('createUserForm');
+
+        createUserForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await axios.post('http://localhost:3000/api/users', {
+                    username,
+                    password
+                });
+
+                console.log(response.data.message);
+                alert(response.data.message);
+                createUserForm.reset();
+            } catch (error) {
+
+                  window.location.href = 'index.html';
+                console.error(error.response.data.error);
+                alert(error.response.data.error);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -9,6 +9,8 @@ const app = express();
 const port = 3000;
 
 app.use(cors());
+
+app.use(express.json());
 app.use(express.static('public'));
 app.use(bodyParser.json());
 
@@ -75,6 +77,16 @@ app.post('/api/login', cors(), async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
+
+
+
+
+
+
+
+
+
+
         // Issue JWT
         const token = jwt.sign({ username }, 'secret-key');
         console.log(token);
@@ -85,6 +97,43 @@ app.post('/api/login', cors(), async (req, res) => {
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+
+
+// API to create a new user
+app.post('/api/users', (req, res) => {
+    const { username, password } = req.body;
+
+    // Create a new user
+    const user = new User({ username, password });
+
+    // Save the user to the database
+    user.save()
+        .then(() => {
+            return res.json({ message: 'User created successfully' });
+        })
+        .catch(error => {
+            console.error(error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // API to add accounts
 app.post('/api/accounts', authenticateToken, (req, res) => {
     const {username ,  password} = req.body;
@@ -173,7 +222,10 @@ app.put('/api/products/:id', authenticateToken, (req, res) => {
             if (!product) {
                 return res.status(404).json({ error: 'Product not found' });
             }
-            return res.json({ message: 'Product updated successfully' });
+            console.log(req.body);
+
+            console.log({ name, price });
+            return res.json({ message: 'Product updatedddddddddddddd successfully' });
         })
         .catch(error => {
             console.error(error);
